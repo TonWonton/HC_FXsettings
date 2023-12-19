@@ -14,6 +14,9 @@
 		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.674" />
 	</ItemGroup>
 	<ItemGroup>
+		<Reference Include="Assembly-CSharp">
+		  <HintPath>..\IL2CPP_net6\Assembly-CSharp.dll</HintPath>
+		</Reference>
 		<Reference Include="Il2Cppmscorlib">
 			<HintPath>..\IL2CPP_net6\Il2Cppmscorlib.dll</HintPath>
 		</Reference>
@@ -41,5 +44,6 @@
 	</ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;D:\Games\HoneyCome\BepInEx\Plugins\&quot; /s /i /y" />
+		<Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;E:\Projects\Releases\&quot; /s /i /y" />
 	</Target>
 </Project>
