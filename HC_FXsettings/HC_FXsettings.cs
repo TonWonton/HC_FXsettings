@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 
 namespace FXsettings
 {
-    [BepInPlugin("HC_FXsettings", "HC_FXsettings", "1.1.0")]
+    [BepInPlugin("HC_FXsettings", "HC_FXsettings", "1.1.1")]
     public class FXsettings : BasePlugin
     {
         private static ConfigEntry<bool> AutoApply;
@@ -50,6 +50,13 @@ namespace FXsettings
         private static ConfigEntry<float> ColorTemp;
         private static ConfigEntry<float> ColorTempBlend;
 
+        private static ConfigEntry<float> TonemapExposureCharamaker;
+        private static ConfigEntry<float> TonemapBrightnessCharamaker;
+        private static ConfigEntry<float> BloomIntensityCharamaker;
+        private static ConfigEntry<float> BloomThresholdCharamaker;
+        private static ConfigEntry<float> SaturationCharamaker;
+
+        public static GameObject gameObject;
         public static Scene scene;
         public static Volume volume;
         public static Camera postProcessCamera;
@@ -76,13 +83,13 @@ namespace FXsettings
             SoftShadows = Config.Bind("Shadows", "Soft shadows", true, "Toggle soft shadows");
             SoftShadows.SettingChanged += (sender, args) => ApplyUnitySettings();
             //Antialiasing
-            AllowMSAA = Config.Bind("Anti aliasing", "MSAA", true, "Enable MSAA");
+            AllowMSAA = Config.Bind("Antialiasing", "MSAA", true, "Enable MSAA");
             AllowMSAA.SettingChanged += (sender, args) => ApplyUnitySettings();
-            MSAAQuality = Config.Bind("Anti aliasing", "MSAA quality", 0, new ConfigDescription("Set MSAA quality", new AcceptableValueList<int>(0, 2, 4, 8, 16)));
+            MSAAQuality = Config.Bind("Antialiasing", "MSAA quality", 0, new ConfigDescription("Set MSAA quality", new AcceptableValueList<int>(0, 2, 4, 8, 16)));
             MSAAQuality.SettingChanged += (sender, args) => ApplyUnitySettings();
-            SoftwareAntiAliasing = Config.Bind("Anti Aliasing", "Postprocess antialiasing", swAntiAliasingMode.None, "Set postprocess antialiasing mode");
+            SoftwareAntiAliasing = Config.Bind("Antialiasing", "Postprocess antialiasing", swAntiAliasingMode.None, "Set postprocess antialiasing mode");
             SoftwareAntiAliasing.SettingChanged += (sender, args) => ApplyUnitySettings();
-            SoftwareAntiAliasingQuality = Config.Bind("Anti Aliasing", "SMAA quality", swAntiAliasingQuality.High, "Set postprocess antialiasing quality");
+            SoftwareAntiAliasingQuality = Config.Bind("Antialiasing", "SMAA quality", swAntiAliasingQuality.High, "Set postprocess antialiasing quality");
             SoftwareAntiAliasingQuality.SettingChanged += (sender, args) => ApplyUnitySettings();
             //Postprocessing effects
             BeautifyFiltering = Config.Bind("Beautify filtering", "Toggle all Beautify filtering", true, "Toggle all Beautify filtering");
@@ -134,15 +141,26 @@ namespace FXsettings
             Blue.SettingChanged += (sender, args) => ApplySettings();
             Daltonize = Config.Bind("Image adjustments", "Daltonize", 0.3f, new ConfigDescription("Set daltonize", new AcceptableValueRange<float>(0f, 2f)));
             Daltonize.SettingChanged += (sender, args) => ApplySettings();
+            //Charamaker specific settings
+            TonemapBrightnessCharamaker = Config.Bind("Charamaker settings", "Tone mapping brightness charamaker", 1.2f, new ConfigDescription("Set tone mapping brightness for charamaker", new AcceptableValueRange<float>(0f, 10f)));
+            TonemapBrightnessCharamaker.SettingChanged += (sender, args) => ApplySettings();
+            TonemapExposureCharamaker = Config.Bind("Charamaker settings", "Tone mapping exposure charamaker", 1.5f, new ConfigDescription("Set tone mapping exposure for charamaker", new AcceptableValueRange<float>(0f, 10f)));
+            TonemapExposureCharamaker.SettingChanged += (sender, args) => ApplySettings();
+            BloomIntensityCharamaker = Config.Bind("Charamaker settings", "Bloom intensity charamaker", 1f, new ConfigDescription("Set bloom intensity for charamaker", new AcceptableValueRange<float>(0f, 10f)));
+            BloomIntensityCharamaker.SettingChanged += (sender, args) => ApplySettings();
+            BloomThresholdCharamaker = Config.Bind("Charamaker settings", "Bloom threshold charamaker", 0.98f, new ConfigDescription("Set bloom threshold for charamaker", new AcceptableValueRange<float>(0f, 5f)));
+            BloomThresholdCharamaker.SettingChanged += (sender, args) => ApplySettings();
+            SaturationCharamaker = Config.Bind("Charamaker settings", "Saturation charamaker", 1.5f, new ConfigDescription("Set saturation for charamaker", new AcceptableValueRange<float>(-2f, 3f)));
+            SaturationCharamaker.SettingChanged += (sender, args) => ApplySettings();
 
             //on new scene
             SceneManager.add_sceneLoaded(new Action<Scene, LoadSceneMode>((s, lsm) =>
             {
-                //Check if map/charamake gameobject has been loaded
-                var gameObject = s.GetRootGameObjects()[0];
+                //Check if map/charamaker gameobject has been loaded
+                gameObject = s.GetRootGameObjects()[0];
                 if (AutoApply.Value && (gameObject.name == "Map") || (gameObject.name == "CustomScene"))
                 {
-                    //Check if main game or charamake and get volume + camera
+                    //Check if main game or charamaker and get volume + camera
                     if (gameObject.name == "Map")
                     {
                         volume = BeautifySettings.FindBeautifyVolume();
@@ -190,22 +208,34 @@ namespace FXsettings
                 beautifyInstance.sharpenRelaxation.Override(SharpenRelaxation.Value);
                 beautifyInstance.sharpenMotionSensibility.Override(SharpenMotionSensibility.Value);
                 beautifyInstance.stripBeautifyTonemapping.Override(!EnableToneMapping.Value);
-                beautifyInstance.tonemapExposurePre.Override(TonemapExposure.Value);
-                beautifyInstance.tonemapBrightnessPost.Override(TonemapBrightness.Value);
                 beautifyInstance.brightness.Override(Brightness.Value);
-                beautifyInstance.bloomIntensity.Override(BloomIntensity.Value);
-                beautifyInstance.bloomThreshold.Override(BloomThreshold.Value);
                 beautifyInstance.bloomMaxBrightness.Override(BloomMaxBrightness.Value);
                 beautifyInstance.anamorphicFlaresIntensity.Override(AnamorphicFlaresIntensity.Value);
                 beautifyInstance.anamorphicFlaresThreshold.Override(AnamorphicFlaresThreshold.Value);
                 beautifyInstance.stripBeautifyColorTweaks.Override(!ColorTweaks.Value);
-                beautifyInstance.saturate.Override(Saturation.Value);
                 beautifyInstance.contrast.Override(Contrast.Value);
                 beautifyInstance.daltonize.Override(Daltonize.Value);
                 beautifyInstance.sepia.Override(Sepia.Value);
                 beautifyInstance.tintColor.Override(new Color(Red.Value, Green.Value, Blue.Value, 1f));
                 beautifyInstance.colorTemp.Override(ColorTemp.Value);
                 beautifyInstance.colorTempBlend.Override(ColorTempBlend.Value);
+                //If main game apply normal settings, else apply charamaker specific settings
+                if (gameObject.name == "Map")
+                {
+                    beautifyInstance.tonemapExposurePre.Override(TonemapExposure.Value);
+                    beautifyInstance.tonemapBrightnessPost.Override(TonemapBrightness.Value);
+                    beautifyInstance.bloomIntensity.Override(BloomIntensity.Value);
+                    beautifyInstance.bloomThreshold.Override(BloomThreshold.Value);
+                    beautifyInstance.saturate.Override(Saturation.Value);
+                }
+                else
+                {
+                    beautifyInstance.tonemapExposurePre.Override(TonemapExposureCharamaker.Value);
+                    beautifyInstance.tonemapBrightnessPost.Override(TonemapBrightnessCharamaker.Value);
+                    beautifyInstance.bloomIntensity.Override(BloomIntensityCharamaker.Value);
+                    beautifyInstance.bloomThreshold.Override(BloomThresholdCharamaker.Value);
+                    beautifyInstance.saturate.Override(SaturationCharamaker.Value);
+                }
             }
             else
                 Log.LogError("Beautify instance not found");
