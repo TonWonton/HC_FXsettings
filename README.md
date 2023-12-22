@@ -1,3 +1,7 @@
+Configuration manager v18.1 IL2CPP required to avoid crashes and problems with clicking
+Delete old configuration manager from plugin folder
+https://github.com/BepInEx/BepInEx.ConfigurationManager
+
 ## Installation
 1. Install correct versions of BepInEx Unity IL2CPP and BepInEx.ConfigurationManager
 2. Download from releases
