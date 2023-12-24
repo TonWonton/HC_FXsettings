@@ -3,9 +3,11 @@ BepisPlugins for HC
 
 https://github.com/IllusionMods/BepisPlugins
 
+
 BepInEx Unity Il2Cpp (plugin only tested on 6.0.0-be674 and be680)
 
 https://github.com/BepInEx/BepInEx
+
 
 BepInEx.ConfigurationManager Il2Cpp
 
@@ -15,6 +17,10 @@ BepInEx.ConfigurationManager Il2Cpp v18.1 required to avoid crashes and problems
 
 Delete old configuration manager from plugin folder if you have older version installed
 
+
+All included in HF-patch
+
+https://github.com/ManlyMarco/HC-HF_Patch
 
 ## Installation
 1. Install correct versions of BepInEx Unity IL2CPP and BepInEx.ConfigurationManager
