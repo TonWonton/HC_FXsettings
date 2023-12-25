@@ -1,12 +1,9 @@
-namespace FXsettings
-{
-    internal class FXsettingsInfo
-    {
-        public static class PluginInfo
-        {
-            public const string PLUGIN_GUID = "HC_FXsettings";
-            public const string PLUGIN_NAME = "HC_FXsettings";
-            public const string PLUGIN_VERSION = "1.3.0";
-        }
-    }
-}
+using System.Reflection;
+using FXsettings;
+
+[assembly: AssemblyTitle(FXsettings.FXsettings.PluginName)]
+[assembly: AssemblyDescription(FXsettings.FXsettings.PluginName)]
+[assembly: AssemblyCompany("https://github.com/TonWonton/HC_FXsettings")]
+[assembly: AssemblyProduct(FXsettings.FXsettings.GUID)]
+[assembly: AssemblyCopyright("")]
+[assembly: AssemblyVersion(FXsettings.FXsettings.PluginVersion)]

@@ -12,9 +12,13 @@ namespace FXsettings
 {
     [BepInProcess("HoneyCome")]
     [BepInProcess("HoneyComeccp")]
-    [BepInPlugin("HC_FXsettings", "HC_FXsettings", "1.3.0")]
+    [BepInPlugin(GUID, PluginName, PluginVersion)]
     public class FXsettings : BasePlugin
     {
+        public const string PluginName = "HC_FXsettings";
+        public const string GUID = "HC_FXsettings";
+        public const string PluginVersion = "1.3.1";
+
         private static ConfigEntry<bool> AutoApply;
         private static ConfigEntry<float> RenderScale;
         private static ConfigEntry<bool> AllowDownsampling;
@@ -125,7 +129,7 @@ namespace FXsettings
             //Antialiasing
             AllowMSAA = Config.Bind("Antialiasing", "MSAA", true, "Enable MSAA");
             AllowMSAA.SettingChanged += (sender, args) => ApplyUnitySettings();
-            MSAAQuality = Config.Bind("Antialiasing", "MSAA quality", 0, new ConfigDescription("Set MSAA quality", new AcceptableValueList<int>(0, 2, 4, 8, 16)));
+            MSAAQuality = Config.Bind("Antialiasing", "MSAA quality", 2, new ConfigDescription("Set MSAA quality", new AcceptableValueList<int>(0, 2, 4, 8, 16)));
             MSAAQuality.SettingChanged += (sender, args) => ApplyUnitySettings();
             SoftwareAntiAliasing = Config.Bind("Antialiasing", "Postprocess antialiasing", swAntiAliasingMode.None, "Set postprocess antialiasing mode");
             SoftwareAntiAliasing.SettingChanged += (sender, args) => ApplyUnitySettings();
@@ -134,13 +138,13 @@ namespace FXsettings
             BeautifyFiltering = Config.Bind("Beautify filtering", "Toggle all Beautify filtering", true, "Toggle all Beautify filtering");
             BeautifyFiltering.SettingChanged += (sender, args) => ApplySettings();
             //Bloom and flares
-            BloomIntensity = Config.Bind("Bloom and flares", "Bloom intensity", 0.5f, new ConfigDescription("Set bloom intensity", new AcceptableValueRange<float>(0f, 10f)));
+            BloomIntensity = Config.Bind("Bloom and flares", "Bloom intensity", 0.3f, new ConfigDescription("Set bloom intensity", new AcceptableValueRange<float>(0f, 10f)));
             BloomIntensity.SettingChanged += (sender, args) => ApplySettings();
-            BloomThreshold = Config.Bind("Bloom and flares", "Bloom threshold", 0.9f, new ConfigDescription("Set bloom threshold", new AcceptableValueRange<float>(0f, 5f)));
+            BloomThreshold = Config.Bind("Bloom and flares", "Bloom threshold", 0.85f, new ConfigDescription("Set bloom threshold", new AcceptableValueRange<float>(0f, 5f)));
             BloomThreshold.SettingChanged += (sender, args) => ApplySettings();
             BloomMaxBrightness = Config.Bind("Bloom and flares", "Bloom max brightness", 5f, new ConfigDescription("Set bloom max brightness", new AcceptableValueRange<float>(0f, 10f)));
             BloomMaxBrightness.SettingChanged += (sender, args) => ApplySettings();
-            bloomDepthAtten = Config.Bind("Bloom and flares", "Bloom attenuation depth", 0.05f, new ConfigDescription("Set bloom depth attenuation", new AcceptableValueRange<float>(0f, 1f)));
+            bloomDepthAtten = Config.Bind("Bloom and flares", "Bloom attenuation depth", 0.3f, new ConfigDescription("Set bloom depth attenuation", new AcceptableValueRange<float>(0f, 1f)));
             bloomDepthAtten.SettingChanged += (sender, args) => ApplySettings();
             bloomNearAtten = Config.Bind("Bloom and flares", "Bloom attenuation near", 0.5f, new ConfigDescription("Set bloom near attenuation", new AcceptableValueRange<float>(0f, 24f)));
             bloomNearAtten.SettingChanged += (sender, args) => ApplySettings();
@@ -152,9 +156,9 @@ namespace FXsettings
             AnamorphicFlaresVertical.SettingChanged += (sender, args) => ApplySettings();
             AnamorphicFlaresSpread = Config.Bind("Bloom and flares", "Anamorphic flares spread", 0.2f, new ConfigDescription("Set anamorphic flares spread", new AcceptableValueRange<float>(0.1f, 2f)));
             AnamorphicFlaresSpread.SettingChanged += (sender, args) => ApplySettings();
-            AnamorphicFlaresDepthAtten = Config.Bind("Bloom and flares", "Anamorphic flares attenuation depth", 0f, new ConfigDescription("Set anamorphic flares depth attenuation", new AcceptableValueRange<float>(0f, 1f)));
+            AnamorphicFlaresDepthAtten = Config.Bind("Bloom and flares", "Anamorphic flares attenuation depth", 0.97f, new ConfigDescription("Set anamorphic flares depth attenuation", new AcceptableValueRange<float>(0f, 1f)));
             AnamorphicFlaresDepthAtten.SettingChanged += (sender, args) => ApplySettings();
-            AnamorphicFlaresNearAtten = Config.Bind("Bloom and flares", "Anamorphic flares attenuation near", 0f, new ConfigDescription("Set anamorphic flares near attenuation", new AcceptableValueRange<float>(0f, 24f)));
+            AnamorphicFlaresNearAtten = Config.Bind("Bloom and flares", "Anamorphic flares attenuation near", 0.97f, new ConfigDescription("Set anamorphic flares near attenuation", new AcceptableValueRange<float>(0f, 24f)));
             AnamorphicFlaresNearAtten.SettingChanged += (sender, args) => ApplySettings();
             AnamorphicFlaresAntiflicker = Config.Bind("Bloom and flares", "Anamorphic flares antiflicker", false, "Toggle anamorphic flares antiflicker");
             AnamorphicFlaresAntiflicker.SettingChanged += (sender, args) => ApplySettings();
@@ -175,15 +179,15 @@ namespace FXsettings
             SharpenRelaxation.SettingChanged += (sender, args) => ApplySettings();
             SharpenMotionSensibility = Config.Bind("Sharpening", "Sharpening motion sensibility", 0.5f, new ConfigDescription("Reduces sharpen effect while camera moves/rotates", new AcceptableValueRange<float>(0f, 1f)));
             SharpenMotionSensibility.SettingChanged += (sender, args) => ApplySettings();
-            sharpenDepthThreshold = Config.Bind("Sharpening", "Sharpen depth threshold", 0.005f, new ConfigDescription("Will compute depth difference around pixels to detect edges\nThis will protect thin objects like standalone wires or lines", new AcceptableValueRange<float>(0f, 1f)));
+            sharpenDepthThreshold = Config.Bind("Sharpening", "Sharpen depth threshold", 0.97f, new ConfigDescription("Will compute depth difference around pixels to detect edges\nThis will protect thin objects like standalone wires or lines", new AcceptableValueRange<float>(0f, 1f)));
             sharpenDepthThreshold.SettingChanged += (sender, args) => ApplySettings();
-            sharpenMinDepth = Config.Bind("Sharpening", "Sharpen min depth", 0.0f, new ConfigDescription("Set sharpen min depth", new AcceptableValueRange<float>(0f, 1.1f)));
+            sharpenMinDepth = Config.Bind("Sharpening", "Sharpen min depth", 0.28f, new ConfigDescription("Set sharpen min depth", new AcceptableValueRange<float>(0f, 1.1f)));
             sharpenMinDepth.SettingChanged += (sender, args) => ApplySettings();
-            sharpenMaxDepth = Config.Bind("Sharpening", "Sharpen max depth", 0.53f, new ConfigDescription("Set sharpen max depth", new AcceptableValueRange<float>(0f, 1.1f)));
+            sharpenMaxDepth = Config.Bind("Sharpening", "Sharpen max depth", 0f, new ConfigDescription("Set sharpen max depth", new AcceptableValueRange<float>(0f, 1.1f)));
             sharpenMaxDepth.SettingChanged += (sender, args) => ApplySettings();
-            sharpenMinMaxDepthFallOff = Config.Bind("Sharpening", "Sharpen min/max depth falloff", 0.353f, new ConfigDescription("Set sharpen min/max depth falloff", new AcceptableValueRange<float>(0f, 1f)));
+            sharpenMinMaxDepthFallOff = Config.Bind("Sharpening", "Sharpen min/max depth falloff", 0.97f, new ConfigDescription("Set sharpen min/max depth falloff", new AcceptableValueRange<float>(0f, 1f)));
             sharpenMinMaxDepthFallOff.SettingChanged += (sender, args) => ApplySettings();
-            sharpenClamp = Config.Bind("Sharpening", "Sharpen clamp", 1f, new ConfigDescription("Maximum effect applied over a single pixel", new AcceptableValueRange<float>(0f, 1f)));
+            sharpenClamp = Config.Bind("Sharpening", "Sharpen clamp", 0.97f, new ConfigDescription("Maximum effect applied over a single pixel", new AcceptableValueRange<float>(0f, 1f)));
             sharpenClamp.SettingChanged += (sender, args) => ApplySettings();
             //Color
             ColorTweaks = Config.Bind("Color", "Color tweaks", true, "Toggle color tweaks");
@@ -400,6 +404,9 @@ namespace FXsettings
         {
             if (postProcessCamera != null)
             {
+                Log.LogInfo(postProcessCamera.allowMSAA);
+                Log.LogInfo(UniversalRenderPipeline.asset.msaaSampleCount);
+                Log.LogInfo(postProcessCamera.GetUniversalAdditionalCameraData().antialiasing);
                 postProcessCamera.allowMSAA = AllowMSAA.Value;
                 UniversalRenderPipeline.asset.msaaSampleCount = MSAAQuality.Value;
                 UniversalRenderPipeline.asset.renderScale = RenderScale.Value;
