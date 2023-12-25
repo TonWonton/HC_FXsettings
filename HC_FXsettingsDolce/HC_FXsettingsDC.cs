@@ -14,8 +14,8 @@ namespace FXsettings
     [BepInPlugin(GUID, PluginName, PluginVersion)]
     public class FXsettings : BasePlugin
     {
-        public const string PluginName = "HC_FXsettings";
-        public const string GUID = "HC_FXsettings";
+        public const string PluginName = "HC_FXsettingsDC";
+        public const string GUID = "HC_FXsettingsDC";
         public const string PluginVersion = "1.3.1";
 
         private static ConfigEntry<bool> AutoApply;
