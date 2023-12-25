@@ -3,47 +3,30 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<OutputType>Library</OutputType>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="info.txt" />
 	  <None Remove="InfoBaseUntiyItem.txt" />
-	  <None Remove="Properties\InfoBaseUntiyItem.txt" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.674" />
+		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.680" />
+		<PackageReference Include="IllusionLibs.HoneyCome.UnityEngine" Version="2021.3.14.3" />
+		<PackageReference Include="IllusionLibs.HoneyComeStudio.Assembly-CSharp" Version="2023.101.12.22" />
 	</ItemGroup>
 	<ItemGroup>
-		<Reference Include="Assembly-CSharp">
-		  <HintPath>..\IL2CPP_net6\Assembly-CSharp.dll</HintPath>
-		</Reference>
-		<Reference Include="Beautify.Universal.Runtime">
-		  <HintPath>..\IL2CPP_net6\Beautify.Universal.Runtime.dll</HintPath>
-		</Reference>
-		<Reference Include="Il2Cppmscorlib">
-			<HintPath>..\IL2CPP_net6\Il2Cppmscorlib.dll</HintPath>
-		</Reference>
-		<Reference Include="Il2CppSystem">
-			<HintPath>..\IL2CPP_net6\Il2CppSystem.dll</HintPath>
-		</Reference>
-		<Reference Include="Il2CppSystem.Core">
-			<HintPath>..\IL2CPP_net6\Il2CppSystem.Core.dll</HintPath>
-		</Reference>
-		<Reference Include="UnityEngine">
-			<HintPath>..\IL2CPP_net6\UnityEngine.dll</HintPath>
-		</Reference>
-		<Reference Include="Unity.RenderPipelines.Core.Runtime">
-			<HintPath>..\IL2CPP_net6\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
-		</Reference>
-		<Reference Include="Unity.RenderPipelines.Universal.Runtime">
-			<HintPath>..\IL2CPP_net6\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
-		</Reference>
-		<Reference Include="UnityEngine.CoreModule">
-			<HintPath>..\IL2CPP_net6\UnityEngine.CoreModule.dll</HintPath>
-		</Reference>
+	  <Reference Include="Beautify.Universal.Runtime">
+	    <HintPath>..\IL2CPP_net6\Beautify.Universal.Runtime.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Unity.RenderPipelines.Core.Runtime">
+	    <HintPath>..\IL2CPP_net6\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+	  </Reference>
+	  <Reference Include="Unity.RenderPipelines.Universal.Runtime">
+	    <HintPath>..\IL2CPP_net6\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;D:\Games\HoneyCome\DigitalCraft\BepInEx\plugins\&quot; /s /i /y" />
+		<Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;D:\Games\HoneyCome\BepInEx\Plugins\&quot; /s /i /y" />
 		<Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;E:\Projects\Releases\&quot; /s /i /y" />
 	</Target>
 </Project>

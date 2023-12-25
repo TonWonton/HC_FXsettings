@@ -11,9 +11,13 @@ using UnityEngine.Rendering.Universal;
 namespace FXsettings
 {
     [BepInProcess("DigitalCraft")]
-    [BepInPlugin("HC_FXsettingsDC", "HC_FXsettingsDC", "1.3.0")]
+    [BepInPlugin(GUID, PluginName, PluginVersion)]
     public class FXsettings : BasePlugin
     {
+        public const string PluginName = "HC_FXsettings";
+        public const string GUID = "HC_FXsettings";
+        public const string PluginVersion = "1.3.1";
+
         private static ConfigEntry<bool> AutoApply;
         private static ConfigEntry<float> RenderScale;
         private static ConfigEntry<bool> AllowDownsampling;
@@ -118,7 +122,7 @@ namespace FXsettings
             //Antialiasing
             AllowMSAA = Config.Bind("Antialiasing", "MSAA", true, "Enable MSAA");
             AllowMSAA.SettingChanged += (sender, args) => ApplyUnitySettings();
-            MSAAQuality = Config.Bind("Antialiasing", "MSAA quality", 0, new ConfigDescription("Set MSAA quality", new AcceptableValueList<int>(0, 2, 4, 8, 16)));
+            MSAAQuality = Config.Bind("Antialiasing", "MSAA quality", 2, new ConfigDescription("Set MSAA quality", new AcceptableValueList<int>(0, 2, 4, 8, 16)));
             MSAAQuality.SettingChanged += (sender, args) => ApplyUnitySettings();
             SoftwareAntiAliasing = Config.Bind("Antialiasing", "Postprocess antialiasing", swAntiAliasingMode.None, "Set postprocess antialiasing mode");
             SoftwareAntiAliasing.SettingChanged += (sender, args) => ApplyUnitySettings();
