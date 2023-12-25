@@ -404,9 +404,6 @@ namespace FXsettings
         {
             if (postProcessCamera != null)
             {
-                Log.LogInfo(postProcessCamera.allowMSAA);
-                Log.LogInfo(UniversalRenderPipeline.asset.msaaSampleCount);
-                Log.LogInfo(postProcessCamera.GetUniversalAdditionalCameraData().antialiasing);
                 postProcessCamera.allowMSAA = AllowMSAA.Value;
                 UniversalRenderPipeline.asset.msaaSampleCount = MSAAQuality.Value;
                 UniversalRenderPipeline.asset.renderScale = RenderScale.Value;
