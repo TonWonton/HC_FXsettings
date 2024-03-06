@@ -17,8 +17,8 @@ namespace FXsettings
     {
         public const string PluginName = "HC_FXsettings";
         public const string GUID = "HC_FXsettings";
-        public const string PluginVersion = "1.3.1";
-
+        public const string PluginVersion = "1.3.2";
+        //Beautify and Unity settings
         private static ConfigEntry<bool> AutoApply;
         private static ConfigEntry<float> RenderScale;
         private static ConfigEntry<bool> AllowDownsampling;
@@ -33,8 +33,8 @@ namespace FXsettings
         private static ConfigEntry<swAntiAliasingQuality> SoftwareAntiAliasingQuality;
         private static ConfigEntry<bool> BeautifyFiltering;
         private static ConfigEntry<bool> EnableToneMapping;
-        private static ConfigEntry<float> TonemapExposure;
-        private static ConfigEntry<float> TonemapBrightness;
+        private static ConfigEntry<float> TonemapExposureOffset;
+        private static ConfigEntry<float> TonemapBrightnessOffset;
         private static ConfigEntry<float> Brightness;
         private static ConfigEntry<bool> Sharpening;
         private static ConfigEntry<float> SharpenIntensity;
@@ -93,18 +93,21 @@ namespace FXsettings
         private static ConfigEntry<float> depthOfFieldBokehThreshold;
         private static ConfigEntry<float> depthOfFieldBokehIntensity;
         private static ConfigEntry<float> blurIntensity;
-
-        private static ConfigEntry<float> TonemapExposureCharamaker;
-        private static ConfigEntry<float> TonemapBrightnessCharamaker;
+        //Charamaker specific settings
+        private static ConfigEntry<bool> enableTonemappingCharamaker;
+        private static ConfigEntry<float> TonemapExposureOffsetCharamaker;
+        private static ConfigEntry<float> TonemapBrightnessOffsetCharamaker;
         private static ConfigEntry<float> BloomIntensityCharamaker;
         private static ConfigEntry<float> BloomThresholdCharamaker;
         private static ConfigEntry<float> SaturationCharamaker;
-
-        public static GameObject gameObject;
-        public static Scene scene;
-        public static Volume volume;
-        public static Camera postProcessCamera;
-        public static Beautify.Universal.Beautify beautifyInstance;
+        //Variables
+        private static GameObject gameObject;
+        private static Scene scene;
+        private static Volume volume;
+        private static Camera postProcessCamera;
+        private static Beautify.Universal.Beautify beautifyInstance;
+        private static float originalTonemapExposure;
+        private static float originalTonemapBrightness;
 
         public override void Load()
         {
@@ -211,10 +214,10 @@ namespace FXsettings
             Sepia.SettingChanged += (sender, args) => ApplySettings();
             EnableToneMapping = Config.Bind("Image adjustments", "Tone mapping", true, "Toggle tone mapping");
             EnableToneMapping.SettingChanged += (sender, args) => ApplySettings();
-            TonemapExposure = Config.Bind("Image adjustments", "Tone mapping exposure", 2.6f, new ConfigDescription("Set tone mapping exposure", new AcceptableValueRange<float>(0f, 10f)));
-            TonemapExposure.SettingChanged += (sender, args) => ApplySettings();
-            TonemapBrightness = Config.Bind("Image adjustments", "Tone mapping brightness", 1.1f, new ConfigDescription("Set tone mapping brightness", new AcceptableValueRange<float>(0f, 10f)));
-            TonemapBrightness.SettingChanged += (sender, args) => ApplySettings();
+            TonemapExposureOffset = Config.Bind("Image adjustments", "Tone mapping exposure offset", 0f, new ConfigDescription("Set tone mapping exposure offset", new AcceptableValueRange<float>(-3f, 6f)));
+            TonemapExposureOffset.SettingChanged += (sender, args) => ApplySettings();
+            TonemapBrightnessOffset = Config.Bind("Image adjustments", "Tone mapping brightness offset", 0f, new ConfigDescription("Set tone mapping brightness offset", new AcceptableValueRange<float>(-2f, 4f)));
+            TonemapBrightnessOffset.SettingChanged += (sender, args) => ApplySettings();
             Brightness = Config.Bind("Image adjustments", "Brightness", 1f, new ConfigDescription("Set brightness", new AcceptableValueRange<float>(0f, 2f)));
             Brightness.SettingChanged += (sender, args) => ApplySettings();
             Daltonize = Config.Bind("Image adjustments", "Daltonize", 0.3f, new ConfigDescription("Set daltonize", new AcceptableValueRange<float>(0f, 2f)));
@@ -263,10 +266,12 @@ namespace FXsettings
             vignettingAspectRatio = Config.Bind("Vignette", "Vignetting aspect ratio", 1f, new ConfigDescription("Set vignetting aspect ratio", new AcceptableValueRange<float>(0f, 2f)));
             vignettingAspectRatio.SettingChanged += (sender, args) => ApplySettings();
             //Charamaker specific settings
-            TonemapBrightnessCharamaker = Config.Bind("Charamaker settings", "Tone mapping brightness charamaker", 1.2f, new ConfigDescription("Set tone mapping brightness for charamaker", new AcceptableValueRange<float>(0f, 10f)));
-            TonemapBrightnessCharamaker.SettingChanged += (sender, args) => ApplySettings();
-            TonemapExposureCharamaker = Config.Bind("Charamaker settings", "Tone mapping exposure charamaker", 1.5f, new ConfigDescription("Set tone mapping exposure for charamaker", new AcceptableValueRange<float>(0f, 10f)));
-            TonemapExposureCharamaker.SettingChanged += (sender, args) => ApplySettings();
+            enableTonemappingCharamaker = Config.Bind("Charamaker settings", "Enable tonemapping charamaker", true, "Toggle tonemapping for charamaker");
+            enableTonemappingCharamaker.SettingChanged += (sender, args) => ApplySettings();
+            TonemapBrightnessOffsetCharamaker = Config.Bind("Charamaker settings", "Tone mapping brightness offset charamaker", 0f, new ConfigDescription("Set tone mapping brightness offset for charamaker", new AcceptableValueRange<float>(-2f, 4f)));
+            TonemapBrightnessOffsetCharamaker.SettingChanged += (sender, args) => ApplySettings();
+            TonemapExposureOffsetCharamaker = Config.Bind("Charamaker settings", "Tone mapping exposure offset charamaker", 0f, new ConfigDescription("Set tone mapping exposure offset for charamaker", new AcceptableValueRange<float>(-3f, 6f)));
+            TonemapExposureOffsetCharamaker.SettingChanged += (sender, args) => ApplySettings();
             BloomIntensityCharamaker = Config.Bind("Charamaker settings", "Bloom intensity charamaker", 1f, new ConfigDescription("Set bloom intensity for charamaker", new AcceptableValueRange<float>(0f, 10f)));
             BloomIntensityCharamaker.SettingChanged += (sender, args) => ApplySettings();
             BloomThresholdCharamaker = Config.Bind("Charamaker settings", "Bloom threshold charamaker", 0.98f, new ConfigDescription("Set bloom threshold for charamaker", new AcceptableValueRange<float>(0f, 5f)));
@@ -295,6 +300,7 @@ namespace FXsettings
                         volume.profile.TryGet(out beautifyInstance);
                         postProcessCamera = charaCustomComponent._mainCamera;
                     }
+                    GetOriginalValueForOffsets();
                     ApplySettings();
                     ApplyUnitySettings();
                 }
@@ -303,16 +309,22 @@ namespace FXsettings
 
         private enum swAntiAliasingMode
         {
-            None,
-            FXAA,
-            SMAA
+            None = 0,
+            FXAA = 1,
+            SMAA = 2
         }
 
         private enum swAntiAliasingQuality
         {
-            Low,
-            Medium,
-            High
+            Low = 0,
+            Medium = 1,
+            High = 2
+        }
+
+        private void GetOriginalValueForOffsets()
+        {
+            originalTonemapExposure = beautifyInstance.tonemapExposurePre.GetValue<float>();
+            originalTonemapBrightness = beautifyInstance.tonemapBrightnessPost.GetValue<float>();
         }
 
         private void ApplySettings()
@@ -328,7 +340,6 @@ namespace FXsettings
                 beautifyInstance.sharpenIntensity.Override(SharpenIntensity.Value);
                 beautifyInstance.sharpenRelaxation.Override(SharpenRelaxation.Value);
                 beautifyInstance.sharpenMotionSensibility.Override(SharpenMotionSensibility.Value);
-                beautifyInstance.stripBeautifyTonemapping.Override(!EnableToneMapping.Value);
                 beautifyInstance.brightness.Override(Brightness.Value);
                 beautifyInstance.bloomMaxBrightness.Override(BloomMaxBrightness.Value);
                 beautifyInstance.anamorphicFlaresIntensity.Override(AnamorphicFlaresIntensity.Value);
@@ -346,8 +357,6 @@ namespace FXsettings
                 beautifyInstance.tintColor.Override(new Color(Red.Value, Green.Value, Blue.Value, 1f));
                 beautifyInstance.colorTemp.Override(ColorTemp.Value);
                 beautifyInstance.colorTempBlend.Override(ColorTempBlend.Value);
-                beautifyInstance.tonemapExposurePre.Override(TonemapExposure.Value);
-                beautifyInstance.tonemapBrightnessPost.Override(TonemapBrightness.Value);
                 beautifyInstance.bloomIntensity.Override(BloomIntensity.Value);
                 beautifyInstance.bloomThreshold.Override(BloomThreshold.Value);
                 beautifyInstance.saturate.Override(Saturation.Value);
@@ -381,16 +390,18 @@ namespace FXsettings
                 //If main game apply normal settings, else apply charamaker specific settings
                 if (gameObject.name == "Map")
                 {
-                    beautifyInstance.tonemapExposurePre.Override(TonemapExposure.Value);
-                    beautifyInstance.tonemapBrightnessPost.Override(TonemapBrightness.Value);
+                    beautifyInstance.stripBeautifyTonemapping.Override(!EnableToneMapping.Value);
+                    beautifyInstance.tonemapExposurePre.Override(Mathf.Clamp(originalTonemapExposure + TonemapExposureOffset.Value, 0.1f, 6f));
+                    beautifyInstance.tonemapBrightnessPost.Override(Mathf.Clamp(originalTonemapBrightness + TonemapBrightnessOffset.Value, 0.02f, 5f));
                     beautifyInstance.bloomIntensity.Override(BloomIntensity.Value);
                     beautifyInstance.bloomThreshold.Override(BloomThreshold.Value);
                     beautifyInstance.saturate.Override(Saturation.Value);
                 }
                 else
                 {
-                    beautifyInstance.tonemapExposurePre.Override(TonemapExposureCharamaker.Value);
-                    beautifyInstance.tonemapBrightnessPost.Override(TonemapBrightnessCharamaker.Value);
+                    beautifyInstance.stripBeautifyTonemapping.Override(!enableTonemappingCharamaker.Value);
+                    beautifyInstance.tonemapExposurePre.Override(Mathf.Clamp(originalTonemapExposure + TonemapExposureOffsetCharamaker.Value, 0.1f, 6f));
+                    beautifyInstance.tonemapBrightnessPost.Override(Mathf.Clamp(originalTonemapBrightness + TonemapBrightnessOffsetCharamaker.Value, 0.02f, 5f));
                     beautifyInstance.bloomIntensity.Override(BloomIntensityCharamaker.Value);
                     beautifyInstance.bloomThreshold.Override(BloomThresholdCharamaker.Value);
                     beautifyInstance.saturate.Override(SaturationCharamaker.Value);
@@ -410,22 +421,9 @@ namespace FXsettings
                 UniversalRenderPipeline.asset.mainLightShadowmapResolution = MainShadowResolution.Value;
                 UniversalRenderPipeline.asset.supportsSoftShadows = SoftShadows.Value;
                 UniversalRenderPipeline.asset.shadowCascadeCount = ShadowCascadeCount.Value;
-
-                //Apply software antialiasing mode
-                if (SoftwareAntiAliasing.Value == swAntiAliasingMode.None)
-                    postProcessCamera.GetUniversalAdditionalCameraData().antialiasing = AntialiasingMode.None;
-                else if (SoftwareAntiAliasing.Value == swAntiAliasingMode.SMAA)
-                    postProcessCamera.GetUniversalAdditionalCameraData().antialiasing = AntialiasingMode.SubpixelMorphologicalAntiAliasing;
-                else if (SoftwareAntiAliasing.Value == swAntiAliasingMode.FXAA)
-                    postProcessCamera.GetUniversalAdditionalCameraData().antialiasing = AntialiasingMode.FastApproximateAntialiasing;
-
-                //Apply software antialiasing quality
-                if (SoftwareAntiAliasingQuality.Value == swAntiAliasingQuality.High)
-                    postProcessCamera.GetUniversalAdditionalCameraData().antialiasingQuality = AntialiasingQuality.High;
-                else if (SoftwareAntiAliasingQuality.Value == swAntiAliasingQuality.Medium)
-                    postProcessCamera.GetUniversalAdditionalCameraData().antialiasingQuality = AntialiasingQuality.Medium;
-                else if (SoftwareAntiAliasingQuality.Value == swAntiAliasingQuality.Low)
-                    postProcessCamera.GetUniversalAdditionalCameraData().antialiasingQuality = AntialiasingQuality.Low;
+                //Apply software antialiasing mode and quality
+                postProcessCamera.GetUniversalAdditionalCameraData().antialiasing = (AntialiasingMode)SoftwareAntiAliasing.Value;
+                postProcessCamera.GetUniversalAdditionalCameraData().antialiasingQuality = (AntialiasingQuality)SoftwareAntiAliasingQuality.Value;
             }
             else
                 Log.LogError("Post processing camera not found");
