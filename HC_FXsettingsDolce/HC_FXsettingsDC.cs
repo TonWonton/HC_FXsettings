@@ -16,7 +16,7 @@ namespace FXsettings
     {
         public const string PluginName = "HC_FXsettingsDC";
         public const string GUID = "HC_FXsettingsDC";
-        public const string PluginVersion = "1.3.1";
+        public const string PluginVersion = "1.3.2";
 
         private static ConfigEntry<bool> AutoApply;
         private static ConfigEntry<float> RenderScale;
@@ -92,12 +92,9 @@ namespace FXsettings
         private static ConfigEntry<float> depthOfFieldBokehThreshold;
         private static ConfigEntry<float> depthOfFieldBokehIntensity;
         private static ConfigEntry<float> blurIntensity;
-
-
         public static GameObject gameObject;
         public static Camera postProcessCamera;
         public static Beautify.Universal.Beautify beautifyInstance;
-
 
         public override void Load()
         {
@@ -204,9 +201,9 @@ namespace FXsettings
             Sepia.SettingChanged += (sender, args) => ApplySettings();
             EnableToneMapping = Config.Bind("Image adjustments", "Tone mapping", true, "Toggle tone mapping");
             EnableToneMapping.SettingChanged += (sender, args) => ApplySettings();
-            TonemapExposure = Config.Bind("Image adjustments", "Tone mapping exposure", 1.8f, new ConfigDescription("Set tone mapping exposure", new AcceptableValueRange<float>(0f, 10f)));
+            TonemapExposure = Config.Bind("Image adjustments", "Tone mapping exposure", 2.2f, new ConfigDescription("Set tone mapping exposure", new AcceptableValueRange<float>(0.1f, 6f)));
             TonemapExposure.SettingChanged += (sender, args) => ApplySettings();
-            TonemapBrightness = Config.Bind("Image adjustments", "Tone mapping brightness", 1.2f, new ConfigDescription("Set tone mapping brightness", new AcceptableValueRange<float>(0f, 10f)));
+            TonemapBrightness = Config.Bind("Image adjustments", "Tone mapping brightness", 1.1f, new ConfigDescription("Set tone mapping brightness", new AcceptableValueRange<float>(0.02f, 5f)));
             TonemapBrightness.SettingChanged += (sender, args) => ApplySettings();
             Brightness = Config.Bind("Image adjustments", "Brightness", 1f, new ConfigDescription("Set brightness", new AcceptableValueRange<float>(0f, 2f)));
             Brightness.SettingChanged += (sender, args) => ApplySettings();
